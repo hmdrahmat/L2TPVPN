@@ -3,7 +3,7 @@ This VPN only uses L2TP without IPsec. It is based on [setup-ipsec-vpn](https://
 
 ## How to build on server
 ```
-git clone https://github.com/serenitydu/L2TP-only-VPN.git
+git clone https://github.com/hmdrahmat/L2TPVPN.git
 sudo sh vpnsetup.sh
 ```
 
