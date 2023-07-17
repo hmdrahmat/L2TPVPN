@@ -112,8 +112,6 @@ EOF
 cat >> /etc/ppp/chap-secrets <<EOF
 "$VPN_USER" l2tpd "$VPN_PASSWORD" *
 
-cat <<'EOF'
-Done!
 
 
 EOF
