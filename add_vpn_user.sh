@@ -32,7 +32,7 @@ add_vpn_user() {
     exiterr "Script must be run as root. Try 'sudo bash $0'"
   fi
   if ! grep -qs "hwdsl2 VPN script" /etc/sysctl.conf \
-    || [ ! -f /etc/ppp/chap-secrets ] || [ ! -f /etc/ipsec.d/passwd ]; then
+    || [ ! -f /etc/ppp/chap-secrets ]; then
 cat 1>&2 <<'EOF'
 Error: Your must first set up the IPsec VPN server before adding VPN users.
        See: https://github.com/hwdsl2/setup-ipsec-vpn
@@ -52,9 +52,6 @@ EOF
   VPN_PASSWORD=$2
   if [ -z "$VPN_USER" ] || [ -z "$VPN_PASSWORD" ]; then
     show_intro
-    echo
-    echo "List of existing VPN usernames:"
-    cut -f1 -d : /etc/ipsec.d/passwd | LC_ALL=C sort
     echo
     echo "Enter the VPN username you want to add or update."
     read -rp "Username: " VPN_USER
@@ -110,25 +107,14 @@ EOF
   esac
   # Backup config files
   conf_bk "/etc/ppp/chap-secrets"
-  conf_bk "/etc/ipsec.d/passwd"
   # Add or update VPN user
   sed -i "/^\"$VPN_USER\" /d" /etc/ppp/chap-secrets
 cat >> /etc/ppp/chap-secrets <<EOF
 "$VPN_USER" l2tpd "$VPN_PASSWORD" *
-EOF
-  # shellcheck disable=SC2016
-  sed -i '/^'"$VPN_USER"':\$1\$/d' /etc/ipsec.d/passwd
-  VPN_PASSWORD_ENC=$(openssl passwd -1 "$VPN_PASSWORD")
-cat >> /etc/ipsec.d/passwd <<EOF
-$VPN_USER:$VPN_PASSWORD_ENC:xauth-psk
-EOF
-  # Update file attributes
-  chmod 600 /etc/ppp/chap-secrets* /etc/ipsec.d/passwd*
+
 cat <<'EOF'
 Done!
 
-Note: All VPN users will share the same IPsec PSK.
-      If you forgot the PSK, check /etc/ipsec.secrets.
 
 EOF
 }
